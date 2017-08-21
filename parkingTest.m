@@ -1,71 +1,68 @@
-function parkingTest
-    input = 'parkingLot1.png';
+function parkingTest2
+    input = 'shadow1.jpg';
+    I = imread(input);
+    imtool(I)
     outBin = createBinary(input);
-    carArrayOne = [0 0 0 0 0];
-    xPos = 23;
-    totalPix = 285 * 140;
-    
-    for i = 1:5
-       pics{i} = outBin(20:305,xPos:xPos+140);
-       xPos = xPos + 160;
-       total = bwarea(pics{i});
-       result = total/totalPix;
-       if result > 0.1
-           carArrayOne(i) = 1;
+    %imshow(outBin);
+    carArrayOne = [0 0 0 0];
+    for i = 1:4
+       if (i == 1)
+           picBuff = outBin(780:1250,1:530);
+           totalPix = (1256 - 780) * (530 - 1);
+           total = bwarea(picBuff);
+           result = total/totalPix;
+           if result > 0.1
+              carArrayOne(i) = 1;
+           end
+           figure
+           imshowpair(outBin,picBuff,'montage');
+       elseif (i == 2)
+           picBuff = outBin(780:1425,800:1334);
+           total = bwarea(picBuff);
+           totalPix = (1325 - 780) * (1334 - 800);
+           result = total/totalPix;
+           if result > 0.1
+               carArrayOne(i) = 1;
+           end
+           figure
+           imshowpair(outBin,picBuff,'montage');
+       elseif (i == 3)    
+           picBuff = outBin(780:1425,1420:2050);
+           total = bwarea(picBuff);
+           totalPix = (1425 - 780) * (2050 -1420);
+           result = total/totalPix;
+           if result > 0.1
+               carArrayOne(i) = 1;
+           end
+           figure
+           imshowpair(outBin,picBuff,'montage');
+       elseif (i == 4)
+           picBuff = outBin(780:1425,2100:2820);
+           total = bwarea(picBuff);
+           totalPix = (1420 - 780) * (2820 - 2100);
+           result = total/totalPix;
+           if result > 0.1
+               carArrayOne(i) = 1;
+           end
+           figure
+           imshowpair(outBin,picBuff,'montage');
        end
+       disp(result);
     end
-    
-    input = 'parkingLot2.png';
-    imtool (input);
-    outBin = createBinary(input);
-    carArrayTwo = [0 0 0];
-    xPos = 10;
-    
-    for i = 1:3
-       pics{i} = outBin(6:343,xPos+20:xPos+145);
-       xPos = xPos + 147;
-       total = bwarea(pics{i});
-       result = total/totalPix;
-       if result > 0.15
-           carArrayTwo(i) = 1;
-       end
-    end
-    
-    disp('**************************');
-    input = 'parkingLot3.png';
-    imtool (input);
-    outBin = createBinary(input);
-    carArrayThree = [0 0 0];
-    xPos = 18;
-    
-    for i = 1:3
-       pics{i} = outBin(6:343,xPos:xPos+170);
-       xPos = xPos + 175;
-       figure
-       imshow(pics{i});
-       total = bwarea(pics{i});
-       result = total/totalPix;
-       if result > 0.15
-           carArrayThree(i) = 1;
-       end
-    end
-    
     date = datestr(now, 'mm dd,HH:MM:SS');
     outfile = fopen('output.txt', 'w');
     printBuffer = sprintf('%d ',carArrayOne);
     fprintf(outfile,'%s\n',printBuffer);
-    printBuffer = sprintf('%d ',carArrayTwo);
-    fprintf(outfile,'%s\n',printBuffer);
-    printBuffer = sprintf('%d ',carArrayThree);
-    fprintf(outfile,'%s\n',printBuffer);
     fprintf(outfile,'%s\n', date);
     fclose(outfile);
 end
-
 function final = createBinary(inputImage)
     I = imread(inputImage);  
     bw = imbinarize(rgb2gray(I),'adaptive','ForegroundPolarity','dark','Sensitivity',0.38);
     sedisk = strel('disk',3);
     noSmallStructures = imopen(bw, sedisk);
+    imwrite(noSmallStructures,'before_inverse.jpg')
     final = imcomplement(noSmallStructures);
+    sedisk = strel('disk',15);
+    final = imopen(final,sedisk);
 end 
